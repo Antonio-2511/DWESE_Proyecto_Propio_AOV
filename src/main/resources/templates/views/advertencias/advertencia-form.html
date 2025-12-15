@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="fragments/head :: head(
+        ${isEdit} ? #{msg.advertencia-form.edit} : #{msg.advertencia-form.add}
+)"></head>
+
+<body class="d-flex flex-column h-100">
+
+<header th:replace="fragments/header :: header"></header>
+
+<main class="flex-grow-1 d-flex align-items-center justify-content-center py-5">
+
+    <div class="col-md-6 col-lg-5 col-xl-4">
+
+        <h1 class="mb-4 text-center fw-bold"
+            th:text="${isEdit} ? #{msg.advertencia-form.edit} : #{msg.advertencia-form.add}">
+        </h1>
+
+        <form th:object="${advertencia}"
+              th:action="${isEdit} ? @{/advertencias/update} : @{/advertencias/insert}"
+              method="post"
+              class="border rounded p-4 shadow bg-white">
+
+            <!-- ID solo en edición -->
+            <input type="hidden" th:if="${isEdit}" th:field="*{id}"/>
+
+            <!-- TITULO -->
+            <div class="mb-3">
+                <label class="form-label" th:text="#{msg.advertencia.titulo.label}"></label>
+                <input type="text" th:field="*{titulo}" class="form-control" maxlength="100" required>
+                <div class="text-danger small" th:errors="*{titulo}"></div>
+            </div>
+
+            <!-- DESCRIPCIÓN -->
+            <div class="mb-3">
+                <label class="form-label" th:text="#{msg.advertencia.descripcion.label}"></label>
+                <textarea th:field="*{descripcion}" rows="4" class="form-control"></textarea>
+                <div class="text-danger small" th:errors="*{descripcion}"></div>
+            </div>
+
+            <!-- NIVEL -->
+            <div class="mb-3">
+                <label class="form-label" th:text="#{msg.advertencia.nivel.label}"></label>
+                <select class="form-select" th:field="*{nivelCriticidadId}">
+                    <option value="">-- seleccionar --</option>
+                    <option th:each="n : ${niveles}"
+                            th:value="${n.id}"
+                            th:text="${n.nombre}">
+                    </option>
+                </select>
+                <div class="text-danger small" th:errors="*{nivelCriticidadId}"></div>
+            </div>
+
+            <!-- EMERGENCIA -->
+            <div class="mb-4">
+                <label class="form-label" th:text="#{msg.advertencia.esEmergencia.label}"></label>
+                <select class="form-select" th:field="*{esEmergencia}">
+                    <option th:value="true" th:text="#{msg.bool.yes}"></option>
+                    <option th:value="false" th:text="#{msg.bool.no}"></option>
+                </select>
+                <div class="text-danger small" th:errors="*{esEmergencia}"></div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a class="btn btn-secondary"
+                   th:href="@{/advertencias}"
+                   th:text="#{msg.advertencia.return}">
+                </a>
+
+                <button type="submit" class="btn btn-primary px-4"
+                        th:text="${isEdit}
+                            ? #{msg.advertencia.submit.update}
+                            : #{msg.advertencia.submit.create}">
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+<div th:replace="fragments/scripts :: scripts"></div>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/head :: head(#{msg.advertencia-detail.title})"></head>
+
+<body>
+
+<div th:replace="fragments/header :: header"></div>
+
+<main class="form-page">
+    <div class="form-card">
+
+        <h1>
+            <span th:text="#{msg.advertencia-detail.title}"></span>
+            <span th:text="${advertencia.titulo}"></span>
+        </h1>
+
+        <h2 class="h5" th:text="#{msg.advertencia-detail.section.data}"></h2>
+
+        <dl class="row">
+
+            <dt class="col-sm-3" th:text="#{msg.advertencia-detail.field.id}"></dt>
+            <dd class="col-sm-9" th:text="${advertencia.id}"></dd>
+
+            <dt class="col-sm-3" th:text="#{msg.advertencia-detail.field.titulo}"></dt>
+            <dd class="col-sm-9" th:text="${advertencia.titulo}"></dd>
+
+            <dt class="col-sm-3" th:text="#{msg.advertencia-detail.field.descripcion}"></dt>
+            <dd class="col-sm-9" th:text="${advertencia.descripcion}"></dd>
+
+            <dt class="col-sm-3" th:text="#{msg.advertencia-detail.field.fechaEnvio}"></dt>
+            <dd class="col-sm-9" th:text="${advertencia.fechaEnvio}"></dd>
+
+            <dt class="col-sm-3" th:text="#{msg.advertencia-detail.field.esEmergencia}"></dt>
+            <dd class="col-sm-9">
+                <span th:text="${advertencia.esEmergencia} ? #{msg.bool.yes} : #{msg.bool.no}"></span>
+            </dd>
+
+            <dt class="col-sm-3" th:text="#{msg.advertencia-detail.field.nivel}"></dt>
+            <dd class="col-sm-9" th:text="${advertencia.nivelCriticidadNombre}"></dd>
+
+        </dl>
+
+        <a class="btn btn-secondary"
+           th:href="@{/advertencias}"
+           th:text="#{msg.advertencia-detail.action.back}">
+        </a>
+
+    </div>
+</main>
+
+<div th:replace="fragments/footer :: footer"></div>
+<div th:replace="fragments/scripts :: scripts"></div>
+
+</body>
+</html>

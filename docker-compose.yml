@@ -1,0 +1,21 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: proyecto-crud-db
+    env_file: .env
+    environment:
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+
+    ports:
+      - "${DB_PORT}:3306"
+
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./src/main/resources:/docker-entrypoint-initdb.d:ro
+
+
+volumes:
+  db_data:

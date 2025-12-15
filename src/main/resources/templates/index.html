@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/head :: head('Proyecto Propio - Home')"></head>
+
+<body class="d-flex flex-column h-100">
+
+<header th:replace="fragments/header :: header"></header>
+
+<main class="position-relative bg-light" style="height: 100vh;">
+    <div class="position-absolute top-50 start-50 translate-middle text-center">
+
+        <h1 class="display-4 fw-bold">
+            <span th:text="#{msg.home.title}">Proyecto Propio</span>
+        </h1>
+
+        <p class="lead text-muted">
+            <strong>Antonio Orozco</strong> –
+            <span th:text="#{msg.home.subtitle}">
+                Aplicación web para gestionar advertencias con niveles de criticidad.
+            </span>
+        </p>
+
+        <!-- Botón principal -->
+        <a class="btn btn-primary btn-lg mt-3"
+           th:href="@{/advertencias}"
+           th:text="#{msg.home.enterApp}">
+            Entrar en la aplicación
+        </a>
+
+    </div>
+</main>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
+<div th:replace="fragments/scripts :: scripts"></div>
+
+</body>
+</html>

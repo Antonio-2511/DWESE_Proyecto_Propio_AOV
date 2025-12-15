@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/head :: head(#{msg.advertencia-list.title})"></head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<header th:replace="fragments/header :: header"></header>
+
+<main class="container mt-4 mb-5 flex-grow-1">
+
+    <h1 class="mb-4 text-center" th:text="#{msg.advertencia-list.title}">
+        Listado de Advertencias
+    </h1>
+
+    <!-- Error -->
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <!-- Botón añadir CENTRADO -->
+    <div class="d-flex justify-content-center mb-4">
+        <a class="btn btn-success"
+           th:href="@{/advertencias/new}"
+           th:text="#{msg.advertencia-list.add}">
+            Nueva Advertencia
+        </a>
+    </div>
+
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
+        <tr>
+
+            <th>ID</th>
+            <th th:text="#{msg.advertencia-list.titulo}">Título</th>
+            <th th:text="#{msg.advertencia-list.nivel}">Nivel</th>
+            <th th:text="#{msg.advertencia-list.esEmergencia}">Emergencia</th>
+            <th class="text-center" th:text="#{msg.advertencia-list.actions}">Acciones</th>
+
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="a : ${advertencias}">
+            <td th:text="${a.id}"></td>
+            <td th:text="${a.titulo}"></td>
+            <td th:text="${a.nivelCriticidadNombre}"></td>
+            <td th:text="${a.esEmergencia} ? #{msg.bool.yes} : #{msg.bool.no}"></td>
+
+            <td class="text-center">
+                <a class="btn btn-outline-secondary btn-sm me-1"
+                   th:href="@{/advertencias/detail(id=${a.id})}"
+                   th:text="#{msg.advertencia-list.viewDetail}">
+                    Ver
+                </a>
+
+                <a class="btn btn-warning btn-sm me-1"
+                   th:href="@{/advertencias/edit(id=${a.id})}"
+                   th:text="#{msg.advertencia-list.edit}">
+                    Editar
+                </a>
+
+                <form th:action="@{/advertencias/delete(id=${a.id})}" method="post" style="display:inline;">
+                    <button class="btn btn-danger btn-sm"
+                            type="submit"
+                            th:text="#{msg.advertencia-list.delete}"
+                            onclick="return confirm([[#{msg.advertencia-list.confirm}]])">
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</main>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+<div th:replace="fragments/scripts :: scripts"></div>
+
+</body>
+</html>
