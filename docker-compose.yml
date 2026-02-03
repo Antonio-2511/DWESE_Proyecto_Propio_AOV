@@ -1,21 +1,17 @@
 services:
   db:
-    image: mariadb:latest
-    container_name: proyecto-crud-db
-    env_file: .env
+    image: mariadb:10.11
+    container_name: dwese2526-proyecto-propio-db
+    restart: always
     environment:
-      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MARIADB_DATABASE=${DB_DATABASE}
-      - MARIADB_USER=${DB_USER}
-      - MARIADB_PASSWORD=${DB_PASSWORD}
-
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: proyecto_propio
+      MARIADB_USER: aov
+      MARIADB_PASSWORD: 2511
     ports:
-      - "${DB_PORT}:3306"
-
+      - "3307:3306"
     volumes:
-      - db_data:/var/lib/mysql
-      - ./src/main/resources:/docker-entrypoint-initdb.d:ro
-
+      - proyecto_propio_db:/var/lib/mysql
 
 volumes:
-  db_data:
+  proyecto_propio_db:

@@ -1,12 +1,12 @@
 package org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.controllers;
 
 import jakarta.validation.Valid;
-import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.daos.AdvertenciaDAO;
-import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.daos.NivelCriticidadDAO;
-import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.dtos.*;
-import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.entities.Advertencia;
-import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.entities.NivelCriticidad;
-import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.mappers.AdvertenciaMapper;
+
+import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.dtos.AdvertenciaCreateDTO;
+import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.dtos.AdvertenciaDetailDTO;
+import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.dtos.AdvertenciaUpdateDTO;
+import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.services.AdvertenciaService;
+import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.services.NivelCriticidadService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +19,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -34,17 +31,17 @@ public class AdvertenciaController {
     private MessageSource messageSource;
 
     @Autowired
-    private AdvertenciaDAO advertenciaDAO;
+    private AdvertenciaService advertenciaService;
 
     @Autowired
-    private NivelCriticidadDAO nivelCriticidadDAO;
+    private NivelCriticidadService nivelCriticidadService;
 
     // ======================================================
     // MODELO COMÚN: NIVELES DE CRITICIDAD
     // ======================================================
     @ModelAttribute("niveles")
-    public List<NivelCriticidad> cargarNiveles() throws SQLException {
-        return nivelCriticidadDAO.getAll();
+    public Object cargarNiveles() {
+        return nivelCriticidadService.findAll();
     }
 
     // ======================================================
@@ -52,15 +49,13 @@ public class AdvertenciaController {
     // ======================================================
     @GetMapping
     public String listAdvertencias(Model model, Locale locale) {
+
         logger.info("Listando advertencias");
 
         try {
-            List<Advertencia> entities = advertenciaDAO.getAll();
-            List<AdvertenciaDTO> dtos = AdvertenciaMapper.toDTOList(entities);
-            model.addAttribute("advertencias", dtos);
-
+            model.addAttribute("advertencias", advertenciaService.findAll());
         } catch (Exception e) {
-            logger.error("Error al listar advertencias: {}", e.getMessage());
+            logger.error("Error al listar advertencias", e);
             String msg = messageSource.getMessage("msg.advertencia.list.error", null, locale);
             model.addAttribute("errorMessage", msg);
         }
@@ -73,6 +68,7 @@ public class AdvertenciaController {
     // ======================================================
     @GetMapping("/new")
     public String showNewForm(Model model) {
+
         logger.info("Mostrando formulario para crear advertencia");
 
         model.addAttribute("advertencia", new AdvertenciaCreateDTO());
@@ -94,26 +90,15 @@ public class AdvertenciaController {
 
         logger.info("Insertando advertencia {}", advertenciaDTO.getTitulo());
 
+        if (result.hasErrors()) {
+            model.addAttribute("isEdit", false);
+            return "views/advertencias/advertencia-form";
+        }
+
         try {
-            if (result.hasErrors()) {
-                model.addAttribute("isEdit", false);
-                return "views/advertencias/advertencia-form";
-            }
-
-            NivelCriticidad nivel = nivelCriticidadDAO.getById(advertenciaDTO.getNivelCriticidadId());
-            if (nivel == null) {
-                String msg = messageSource.getMessage("msg.advertencia.nivel.notFound", null, locale);
-                redirectAttributes.addFlashAttribute("errorMessage", msg);
-                return "redirect:/advertencias/new";
-            }
-
-            Advertencia entity = AdvertenciaMapper.fromCreateDTO(advertenciaDTO, nivel);
-            entity.setFechaEnvio(LocalDateTime.now());
-
-            advertenciaDAO.insert(entity);
-
+            advertenciaService.create(advertenciaDTO);
         } catch (Exception e) {
-            logger.error("Error insertando advertencia: {}", e.getMessage());
+            logger.error("Error insertando advertencia", e);
             String msg = messageSource.getMessage("msg.advertencia.insert.error", null, locale);
             redirectAttributes.addFlashAttribute("errorMessage", msg);
         }
@@ -133,22 +118,15 @@ public class AdvertenciaController {
         logger.info("Mostrando formulario edición advertencia {}", id);
 
         try {
-            Advertencia entity = advertenciaDAO.getById(id);
-
-            if (entity == null) {
-                String msg = messageSource.getMessage("msg.advertencia.edit.notfound", null, locale);
-                redirectAttributes.addFlashAttribute("errorMessage", msg);
-                return "redirect:/advertencias";
-            }
-
-            AdvertenciaUpdateDTO dto = AdvertenciaMapper.toUpdateDTO(entity);
+            AdvertenciaUpdateDTO dto = advertenciaService.getForEdit(id);
             model.addAttribute("advertencia", dto);
             model.addAttribute("isEdit", true);
 
         } catch (Exception e) {
-            logger.error("Error cargando advertencia: {}", e.getMessage());
-            String msg = messageSource.getMessage("msg.advertencia.edit.error", null, locale);
-            model.addAttribute("errorMessage", msg);
+            logger.error("Error cargando advertencia", e);
+            String msg = messageSource.getMessage("msg.advertencia.edit.notfound", null, locale);
+            redirectAttributes.addFlashAttribute("errorMessage", msg);
+            return "redirect:/advertencias";
         }
 
         return "views/advertencias/advertencia-form";
@@ -167,26 +145,15 @@ public class AdvertenciaController {
 
         logger.info("Actualizando advertencia {}", advertenciaDTO.getId());
 
+        if (result.hasErrors()) {
+            model.addAttribute("isEdit", true);
+            return "views/advertencias/advertencia-form";
+        }
+
         try {
-            if (result.hasErrors()) {
-                model.addAttribute("isEdit", true);
-                return "views/advertencias/advertencia-form";
-            }
-
-            Advertencia entity = advertenciaDAO.getById(advertenciaDTO.getId());
-            if (entity == null) {
-                String msg = messageSource.getMessage("msg.advertencia.edit.notfound", null, locale);
-                redirectAttributes.addFlashAttribute("errorMessage", msg);
-                return "redirect:/advertencias";
-            }
-
-            NivelCriticidad nivel = nivelCriticidadDAO.getById(advertenciaDTO.getNivelCriticidadId());
-            AdvertenciaMapper.copyUpdateToEntity(advertenciaDTO, entity, nivel);
-
-            advertenciaDAO.update(entity);
-
+            advertenciaService.update(advertenciaDTO.getId(), advertenciaDTO);
         } catch (Exception e) {
-            logger.error("Error actualizando advertencia {}", advertenciaDTO.getId());
+            logger.error("Error actualizando advertencia", e);
             String msg = messageSource.getMessage("msg.advertencia.update.error", null, locale);
             redirectAttributes.addFlashAttribute("errorMessage", msg);
         }
@@ -205,9 +172,9 @@ public class AdvertenciaController {
         logger.info("Eliminando advertencia {}", id);
 
         try {
-            advertenciaDAO.delete(id);
+            advertenciaService.delete(id);
         } catch (Exception e) {
-            logger.error("Error eliminando advertencia {}", id);
+            logger.error("Error eliminando advertencia", e);
             String msg = messageSource.getMessage("msg.advertencia.delete.error", null, locale);
             redirectAttributes.addFlashAttribute("errorMessage", msg);
         }
@@ -227,21 +194,12 @@ public class AdvertenciaController {
         logger.info("Mostrando detalle advertencia {}", id);
 
         try {
-            Advertencia entity = advertenciaDAO.getById(id);
-
-            if (entity == null) {
-                String msg = messageSource.getMessage("msg.advertencia.detail.notFound", null, locale);
-                redirectAttributes.addFlashAttribute("errorMessage", msg);
-                return "redirect:/advertencias";
-            }
-
-            AdvertenciaDetailDTO dto = AdvertenciaMapper.toDetailDTO(entity);
+            AdvertenciaDetailDTO dto = advertenciaService.getDetail(id);
             model.addAttribute("advertencia", dto);
-
             return "views/advertencias/advertencia-detail";
 
         } catch (Exception e) {
-            logger.error("Error cargando detalle: {}", e.getMessage());
+            logger.error("Error cargando detalle", e);
             String msg = messageSource.getMessage("msg.advertencia.detail.error", null, locale);
             redirectAttributes.addFlashAttribute("errorMessage", msg);
             return "redirect:/advertencias";
