@@ -1,6 +1,6 @@
 package org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.repositories;
 
-import org.springframework.context.annotation.Role;
+import org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.entities.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -2,12 +2,17 @@ package org.iesalixar.daw2.aov.ProyectoPropio.proyectopropio.entities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class User {
+
+    // =========================
+    // IDENTIFICACIÓN
+    // =========================
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,11 +24,35 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 500)
     private String passwordHash;
 
+    // =========================
+    // ESTADO DE CUENTA
+    // =========================
+
     @Column(nullable = false)
     private boolean active = true;
 
     @Column(name = "account_non_locked", nullable = false)
     private boolean accountNonLocked = true;
+
+    // =========================
+    // SEGURIDAD AVANZADA
+    // =========================
+
+    @Column(name = "last_password_change")
+    private LocalDateTime lastPasswordChange;
+
+    @Column(name = "password_expires_at")
+    private LocalDateTime passwordExpiresAt;
+
+    @Column(name = "must_change_password", nullable = false)
+    private boolean mustChangePassword = false;
+
+    @Column(name = "failed_login_attempts", nullable = false)
+    private int failedLoginAttempts = 0;
+
+    // =========================
+    // ROLES
+    // =========================
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -75,6 +104,38 @@ public class User {
 
     public void setAccountNonLocked(boolean accountNonLocked) {
         this.accountNonLocked = accountNonLocked;
+    }
+
+    public LocalDateTime getLastPasswordChange() {
+        return lastPasswordChange;
+    }
+
+    public void setLastPasswordChange(LocalDateTime lastPasswordChange) {
+        this.lastPasswordChange = lastPasswordChange;
+    }
+
+    public LocalDateTime getPasswordExpiresAt() {
+        return passwordExpiresAt;
+    }
+
+    public void setPasswordExpiresAt(LocalDateTime passwordExpiresAt) {
+        this.passwordExpiresAt = passwordExpiresAt;
+    }
+
+    public boolean isMustChangePassword() {
+        return mustChangePassword;
+    }
+
+    public void setMustChangePassword(boolean mustChangePassword) {
+        this.mustChangePassword = mustChangePassword;
+    }
+
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    public void setFailedLoginAttempts(int failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
     }
 
     public Set<Role> getRoles() {

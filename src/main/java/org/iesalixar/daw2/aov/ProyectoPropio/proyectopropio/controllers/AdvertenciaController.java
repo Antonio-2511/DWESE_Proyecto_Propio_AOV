@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,17 +37,12 @@ public class AdvertenciaController {
     @Autowired
     private NivelCriticidadService nivelCriticidadService;
 
-    // ======================================================
-    // MODELO COMÚN: NIVELES DE CRITICIDAD
-    // ======================================================
+
     @ModelAttribute("niveles")
     public Object cargarNiveles() {
         return nivelCriticidadService.findAll();
     }
 
-    // ======================================================
-    // LISTADO
-    // ======================================================
     @GetMapping
     public String listAdvertencias(Model model, Locale locale) {
 
@@ -63,9 +59,7 @@ public class AdvertenciaController {
         return "views/advertencias/advertencia-list";
     }
 
-    // ======================================================
-    // FORMULARIO: CREAR
-    // ======================================================
+
     @GetMapping("/new")
     public String showNewForm(Model model) {
 
@@ -77,9 +71,7 @@ public class AdvertenciaController {
         return "views/advertencias/advertencia-form";
     }
 
-    // ======================================================
-    // INSERTAR
-    // ======================================================
+
     @PostMapping("/insert")
     public String insertAdvertencia(
             @Valid @ModelAttribute("advertencia") AdvertenciaCreateDTO advertenciaDTO,
@@ -106,9 +98,7 @@ public class AdvertenciaController {
         return "redirect:/advertencias";
     }
 
-    // ======================================================
-    // FORMULARIO: EDITAR
-    // ======================================================
+
     @GetMapping("/edit")
     public String showEditForm(@RequestParam("id") Long id,
                                Model model,
@@ -132,9 +122,7 @@ public class AdvertenciaController {
         return "views/advertencias/advertencia-form";
     }
 
-    // ======================================================
-    // ACTUALIZAR
-    // ======================================================
+
     @PostMapping("/update")
     public String updateAdvertencia(
             @Valid @ModelAttribute("advertencia") AdvertenciaUpdateDTO advertenciaDTO,
@@ -161,10 +149,9 @@ public class AdvertenciaController {
         return "redirect:/advertencias";
     }
 
-    // ======================================================
-    // ELIMINAR
-    // ======================================================
+
     @PostMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN')")
     public String deleteAdvertencia(@RequestParam("id") Long id,
                                     RedirectAttributes redirectAttributes,
                                     Locale locale) {
@@ -182,9 +169,7 @@ public class AdvertenciaController {
         return "redirect:/advertencias";
     }
 
-    // ======================================================
-    // DETALLE
-    // ======================================================
+
     @GetMapping("/detail")
     public String showDetail(@RequestParam("id") Long id,
                              Model model,

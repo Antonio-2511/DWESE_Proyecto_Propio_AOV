@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mi perfil</title>
+</head>
+
+<body>
+
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Mi perfil</h2>
+
+    <!-- Mensaje éxito -->
+    <div th:if="${successMessage}"
+         class="alert alert-success"
+         th:text="${successMessage}">
+    </div>
+
+    <!-- Datos del usuario -->
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <p><strong>Email:</strong>
+                <span th:text="${user.email}"></span>
+            </p>
+
+            <p><strong>Activo:</strong>
+                <span th:text="${user.active} ? 'Sí' : 'No'"></span>
+            </p>
+
+            <p><strong>Cuenta no bloqueada:</strong>
+                <span th:text="${user.accountNonLocked} ? 'Sí' : 'No'"></span>
+            </p>
+
+            <p><strong>Roles:</strong>
+                <span th:each="role : ${user.roles}"
+                      th:text="${role.name}"
+                      class="badge bg-primary me-1">
+                </span>
+            </p>
+
+        </div>
+    </div>
+
+    <!-- Formulario edición -->
+    <div class="card">
+        <div class="card-body">
+
+            <h5 class="mb-3">Editar perfil</h5>
+
+            <form th:action="@{/profile/update}" method="post">
+
+                <!-- CSRF obligatorio con Spring Security -->
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
+
+                <!-- Email (solo lectura) -->
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="text"
+                           class="form-control"
+                           th:value="${user.email}"
+                           readonly />
+                </div>
+
+                <!-- Activo -->
+                <div class="form-check mb-3">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           name="active"
+                           th:checked="${user.active}" />
+                    <label class="form-check-label">
+                        Cuenta activa
+                    </label>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Guardar cambios
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
