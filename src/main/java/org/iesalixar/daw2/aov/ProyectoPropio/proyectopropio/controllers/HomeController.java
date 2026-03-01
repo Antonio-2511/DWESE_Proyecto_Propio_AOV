@@ -11,17 +11,14 @@ public class HomeController {
     @GetMapping("/")
     public String home(Authentication authentication, Model model) {
 
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getName())) {
+
             model.addAttribute("username", authentication.getName());
         }
 
         return "index"; // templates/index.html
-    }
-
-    @GetMapping("/login")
-    public String login() {
-        return "views/login/login";
-        // Ajusta si tu login está en otra carpeta
     }
 
 }
